@@ -48,7 +48,6 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
       );
 
     // Add sub commands
-    addCommand(SampleCommand(logger: _logger));
     addCommand(CheckUnusedCommand(logger: _logger, fileSystem: _fileSystem));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }

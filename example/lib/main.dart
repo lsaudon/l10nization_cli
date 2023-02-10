@@ -26,6 +26,7 @@ class _HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(AppLocalizations.of(context).helloWorld),
+              Text(AppLocalizations.of(context).helloWorld),
             ],
           ),
         ),
