@@ -50,7 +50,7 @@ class CheckUnusedCommand extends Command<int> {
 
     _logger.info(result.value.toString());
 
-    final files = await Glob('**.dart')
+    Glob('**.dart')
         .list(root: '${_fileSystem.currentDirectory.path}\\example')
         .where((final file) {
       if (file is! File) {
@@ -58,8 +58,7 @@ class CheckUnusedCommand extends Command<int> {
       }
       return !['.dart_tool']
           .any((final excludePattern) => file.path.contains(excludePattern));
-    }).toList();
-    files.forEach(print);
+    });
 
     return ExitCode.success.code;
   }

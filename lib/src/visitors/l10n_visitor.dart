@@ -10,8 +10,8 @@ class L10nVisitor extends GeneralizingAstVisitor<bool> {
   @override
   bool? visitSimpleIdentifier(final SimpleIdentifier node) {
     if (node.name == _value) {
-      print('Find');
+      return true;
     }
-    return true;
+    return false;
   }
 }
