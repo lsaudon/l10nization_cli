@@ -20,15 +20,24 @@ class _HomePage extends StatelessWidget {
   const _HomePage();
 
   @override
-  Widget build(final BuildContext context) => Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context).helloWorld),
-              Text(AppLocalizations.of(context).helloWorld),
-            ],
-          ),
+  Widget build(final BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(AppLocalizations.of(context).helloWorld),
+            Text(AppLocalizations.of(context).helloWorld),
+            Text(l10n.helloMoon),
+            Text(Stuff().seeingTheWorldAgain),
+          ],
         ),
-      );
+      ),
+    );
+  }
+}
+
+class Stuff {
+  String get seeingTheWorldAgain => 'Seeing the world again';
 }

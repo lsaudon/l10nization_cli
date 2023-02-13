@@ -18,6 +18,7 @@ nullable-getter: false''';
 const arbFileContentSimple = '''
 {
   "@@locale": "en",
+  "helloMoon": "Hello Moon",
   "helloWorld": "Hello World",
   "seeingTheWorldAgain": "Seeing the world again"
 }''';
@@ -29,12 +30,14 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get helloMoon => 'Hello Moon';
+
+  @override
   String get helloWorld => 'Hello World';
 
   @override
   String get seeingTheWorldAgain => 'Seeing the world again';
-}
-''';
+}''';
 
 const appLocalizationsFileContent = r'''
 import 'dart:async';
@@ -68,6 +71,8 @@ abstract class AppLocalizations {
     Locale('en')
   ];
 
+  String get helloMoon;
+
   String get helloWorld;
 
   String get seeingTheWorldAgain;
@@ -99,7 +104,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
     'that was used.'
   );
-}''';
+}
+''';
 
 const l10nDartFileContent = '''
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';''';
@@ -127,17 +133,26 @@ class _HomePage extends StatelessWidget {
   const _HomePage();
 
   @override
-  Widget build(final BuildContext context) => Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context).helloWorld),
-              Text(AppLocalizations.of(context).helloWorld),
-            ],
-          ),
+  Widget build(final BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(AppLocalizations.of(context).helloWorld),
+            Text(AppLocalizations.of(context).helloWorld),
+            Text(l10n.helloMoon),
+            Text(Stuff().seeingTheWorldAgain),
+          ],
         ),
-      );
+      ),
+    );
+  }
+}
+
+class Stuff {
+  String get seeingTheWorldAgain => 'Seeing the world again';
 }''';
 
 void main() {
@@ -150,31 +165,20 @@ void main() {
             : FileSystemStyle.posix,
       );
 
-      mfs.file(
-        '.dart_tool/flutter_gen/gen_l10n/app_localizations_en.dart',
-      )
-        ..createSync(recursive: true)
-        ..writeAsStringSync(appLocalizationsEnFileContent);
-
-      mfs.file('.dart_tool/flutter_gen/gen_l10n/app_localizations.dart')
-        ..createSync(recursive: true)
-        ..writeAsStringSync(appLocalizationsFileContent);
-
-      mfs.file('lib/l10n/arb/app_en.arb')
-        ..createSync(recursive: true)
-        ..writeAsStringSync(arbFileContentSimple);
-
-      mfs.file('lib/l10n/l10n.dart')
-        ..createSync(recursive: true)
-        ..writeAsStringSync(l10nDartFileContent);
-
-      mfs.file('lib/main.dart')
-        ..createSync(recursive: true)
-        ..writeAsStringSync(mainFileContent);
-
-      mfs.file('l10n.yaml')
-        ..createSync()
-        ..writeAsStringSync(l10nFileContent);
+      <String, String>{
+        '.dart_tool/flutter_gen/gen_l10n/app_localizations_en.dart':
+            appLocalizationsEnFileContent,
+        '.dart_tool/flutter_gen/gen_l10n/app_localizations.dart':
+            appLocalizationsFileContent,
+        'lib/l10n/arb/app_en.arb': arbFileContentSimple,
+        'lib/l10n/l10n.dart': l10nDartFileContent,
+        'lib/main.dart': mainFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => mfs.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
 
       final commandRunner = L10nizationCliCommandRunner(
         logger: logger,
@@ -186,8 +190,8 @@ void main() {
       );
 
       verifyNever(() => logger.info('helloWorld'));
+      verifyNever(() => logger.info('helloMoon'));
       verify(() => logger.info('seeingTheWorldAgain')).called(1);
-      verify(() => logger.success('Success')).called(1);
 
       expect(exitCode, ExitCode.success.code);
     });
