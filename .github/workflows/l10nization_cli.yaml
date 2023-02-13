@@ -29,6 +29,8 @@ jobs:
     with:
       min_coverage: 90
 
+  pana:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/pana.yml@v1
 
   verify-version:
     runs-on: ubuntu-latest
