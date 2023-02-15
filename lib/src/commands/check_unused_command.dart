@@ -43,50 +43,14 @@ class CheckUnusedCommand extends Command<int> {
 
   @override
   Future<int> run() async {
-    final root = p.join(
-      _fileSystem.currentDirectory.path,
-      argResults!['root'] as String? ?? '',
-    );
+    final root = _getRoot();
+    final list = await _getDartFiles(root);
+    final keys = await _getKeys(root);
+    final unusedKeys = await _getUnusedTranslations(list, keys);
 
-    final doc = loadYaml(
-      await _fileSystem.file(p.join(root, 'l10n.yaml')).readAsString(),
-    ) as YamlMap;
-
-    final keys = (json.decode(
-      await _fileSystem
-          .file(
-            p.join(
-              root,
-              p.joinAll(doc['arb-dir'].toString().split(RegExp(r'(/|\\)'))),
-              doc['template-arb-file'].toString(),
-            ),
-          )
-          .readAsString(),
-    ) as Map<String, dynamic>)
-        .keys
-        .where((final e) => !e.startsWith('@'));
-
-    final invocations = <String>{};
-
-    final list = await Glob('**.dart')
-        .listFileSystem(_fileSystem, root: root)
-        .where((final f) {
-      if (f is! File) {
-        return false;
-      }
-      return !['.dart_tool'].any((final e) => f.path.contains(e));
-    }).toList();
-
-    for (final file in list) {
-      final result =
-          parseString(content: await _fileSystem.file(file).readAsString());
-      final visitor = L10nVisitor(keys);
-      result.unit.visitChildren(visitor);
-      invocations.addAll(visitor.invocations);
+    if (unusedKeys.isEmpty) {
+      return ExitCode.success.code;
     }
-
-    final unusedKeys = keys.toList();
-    invocations.forEach(unusedKeys.remove);
 
     _logger.info('''
 
@@ -95,6 +59,61 @@ The list of unused translations:
     unusedKeys.forEach(_logger.info);
     _logger.info('');
 
-    return ExitCode.success.code;
+    return 1;
+  }
+
+  String _getRoot() => p.join(
+        _fileSystem.currentDirectory.path,
+        argResults!['root'] as String? ?? '',
+      );
+
+  Future<Iterable<FileSystemEntity>> _getDartFiles(final String root) async =>
+      Glob('**.dart')
+          .listFileSystem(
+        _fileSystem,
+        root: root,
+        followLinks: false,
+      )
+          .where((final f) {
+        if (f is! File) {
+          return false;
+        }
+        return !['.dart_tool'].any((final e) => f.path.contains(e));
+      }).toList();
+
+  Future<Iterable<String>> _getKeys(final String root) async {
+    final doc = loadYaml(
+      await _fileSystem.file(p.join(root, 'l10n.yaml')).readAsString(),
+    ) as YamlMap;
+    return (json.decode(
+      await _fileSystem
+          .file(
+            p.join(
+              root,
+              p.joinAll(p.split(doc['arb-dir'].toString())),
+              doc['template-arb-file'].toString(),
+            ),
+          )
+          .readAsString(),
+    ) as Map<String, dynamic>)
+        .keys
+        .where((final e) => !e.startsWith('@'));
+  }
+
+  Future<Iterable<String>> _getUnusedTranslations(
+    final Iterable<FileSystemEntity> list,
+    final Iterable<String> keys,
+  ) async {
+    final aKeys = keys.toList();
+    for (final file in list) {
+      final visitor = L10nVisitor(aKeys);
+      parseString(content: await _fileSystem.file(file).readAsString())
+          .unit
+          .visitChildren(visitor);
+      aKeys
+        ..clear()
+        ..addAll(visitor.unusedKeys);
+    }
+    return aKeys;
   }
 }

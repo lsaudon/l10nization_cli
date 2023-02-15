@@ -10,13 +10,60 @@ import 'package:test/test.dart';
 
 import '../mocks/mocks.dart';
 
-const l10nFileContent =
-    '''
+void main() {
+  group('check-unused', () {
+    group('when 0 translation is unused then success code', () {
+      const l10nFileContent = '''
 arb-dir: lib/l10n/arb
 template-arb-file: app_en.arb''';
 
-const arbFileContentSimple =
-    '''
+      const arbFileContentSimple = '''
+{
+  "@@locale": "en",
+  "a": "a"
+}''';
+
+      const mainFileContent = '''
+void main() {
+  AppLocalizations.of(context).a;
+}''';
+
+      test('with --root', () async {
+        final mfs = MemoryFileSystem.test(
+          style: Platform.isWindows
+              ? FileSystemStyle.windows
+              : FileSystemStyle.posix,
+        );
+        <String, String>{
+          p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+          p.join('lib', 'main.dart'): mainFileContent,
+          'l10n.yaml': l10nFileContent,
+        }.forEach(
+          (final path, final content) => mfs.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
+
+        final logger = MockLogger();
+        final exitCode = await L10nizationCliCommandRunner(
+          logger: logger,
+          fileSystem: mfs,
+        ).run(
+          [CheckUnusedCommand.commandName],
+        );
+
+        verifyNever(() => logger.info('a'));
+
+        expect(exitCode, ExitCode.success.code);
+      });
+    });
+
+    group('when 1 translation is unused then error code', () {
+      const l10nFileContent = '''
+arb-dir: lib/l10n/arb
+template-arb-file: app_en.arb''';
+
+      const arbFileContentSimple = '''
 {
   "@@locale": "en",
   "a": "a",
@@ -25,8 +72,7 @@ const arbFileContentSimple =
   "d": "d"
 }''';
 
-const mainFileContent =
-    '''
+      const mainFileContent = '''
 void main() {
   AppLocalizations.of(context).a;
   AppLocalizations.of(context).a;
@@ -35,75 +81,74 @@ void main() {
   context.l10n.d;
 }''';
 
-void main() {
-  group('check-unused', () {
-    test('without --root', () async {
-      final mfs = MemoryFileSystem.test(
-        style: Platform.isWindows
-            ? FileSystemStyle.windows
-            : FileSystemStyle.posix,
-      );
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => mfs.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+      test('without --root', () async {
+        final mfs = MemoryFileSystem.test(
+          style: Platform.isWindows
+              ? FileSystemStyle.windows
+              : FileSystemStyle.posix,
+        );
+        <String, String>{
+          p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+          p.join('lib', 'main.dart'): mainFileContent,
+          'l10n.yaml': l10nFileContent,
+        }.forEach(
+          (final path, final content) => mfs.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
 
-      final logger = MockLogger();
-      final exitCode = await L10nizationCliCommandRunner(
-        logger: logger,
-        fileSystem: mfs,
-      ).run(
-        [CheckUnusedCommand.commandName],
-      );
+        final logger = MockLogger();
+        final exitCode = await L10nizationCliCommandRunner(
+          logger: logger,
+          fileSystem: mfs,
+        ).run(
+          [CheckUnusedCommand.commandName],
+        );
 
-      verifyNever(() => logger.info('a'));
-      verifyNever(() => logger.info('b'));
-      verify(() => logger.info('c')).called(1);
-      verifyNever(() => logger.info('d'));
+        verifyNever(() => logger.info('a'));
+        verifyNever(() => logger.info('b'));
+        verify(() => logger.info('c')).called(1);
+        verifyNever(() => logger.info('d'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+        expect(exitCode, 1);
+      });
 
-    test('with --root', () async {
-      final mfs = MemoryFileSystem.test(
-        style: Platform.isWindows
-            ? FileSystemStyle.windows
-            : FileSystemStyle.posix,
-      );
-      <String, String>{
-        p.join('my_app', 'lib', 'l10n', 'arb', 'app_en.arb'):
-            arbFileContentSimple,
-        p.join('my_app', 'lib', 'main.dart'): mainFileContent,
-        p.join('my_app', 'l10n.yaml'): l10nFileContent,
-      }.forEach(
-        (final path, final content) => mfs.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+      test('with --root', () async {
+        final mfs = MemoryFileSystem.test(
+          style: Platform.isWindows
+              ? FileSystemStyle.windows
+              : FileSystemStyle.posix,
+        );
+        <String, String>{
+          p.join('my_app', 'lib', 'l10n', 'arb', 'app_en.arb'):
+              arbFileContentSimple,
+          p.join('my_app', 'lib', 'main.dart'): mainFileContent,
+          p.join('my_app', 'l10n.yaml'): l10nFileContent,
+        }.forEach(
+          (final path, final content) => mfs.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
 
-      final logger = MockLogger();
-      final exitCode = await L10nizationCliCommandRunner(
-        logger: logger,
-        fileSystem: mfs,
-      ).run(
-        [
-          CheckUnusedCommand.commandName,
-          '--root',
-          'my_app',
-        ],
-      );
+        final logger = MockLogger();
+        final exitCode = await L10nizationCliCommandRunner(
+          logger: logger,
+          fileSystem: mfs,
+        ).run(
+          [
+            CheckUnusedCommand.commandName,
+            '--root',
+            'my_app',
+          ],
+        );
 
-      verifyNever(() => logger.info('a'));
-      verifyNever(() => logger.info('b'));
-      verify(() => logger.info('c')).called(1);
-      verifyNever(() => logger.info('d'));
+        verifyNever(() => logger.info('a'));
+        verifyNever(() => logger.info('b'));
+        verify(() => logger.info('c')).called(1);
+        verifyNever(() => logger.info('d'));
 
-      expect(exitCode, ExitCode.success.code);
+        expect(exitCode, 1);
+      });
     });
   });
 }

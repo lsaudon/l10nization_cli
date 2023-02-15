@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// L10nVisitor
 class L10nVisitor extends RecursiveAstVisitor<void> {
   /// L10nVisitor
-  L10nVisitor(this._value);
+  L10nVisitor(final Iterable<String> keys) : _values = keys.toList();
 
   static const _list = [
     'l10n',
@@ -12,22 +12,19 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
     'AppLocalizations.of(context)',
   ];
 
-  final Iterable<String> _value;
+  final List<String> _values;
 
-  final _invocations = <String>{};
-
-  /// invocations
-  Set<String> get invocations => _invocations;
+  /// unusedKeys
+  List<String> get unusedKeys => _values;
 
   @override
   void visitSimpleIdentifier(final SimpleIdentifier node) {
-    if (_value.contains(node.name) &&
+    if (_values.contains(node.name) &&
         node.parent!.childEntities.any(
           (final e) => _list.contains(e.toString()),
         )) {
-      _invocations.add(node.name);
+      _values.remove(node.name);
       return;
     }
-    return;
   }
 }
