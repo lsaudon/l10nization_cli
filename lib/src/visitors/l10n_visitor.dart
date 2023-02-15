@@ -6,7 +6,11 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
   /// L10nVisitor
   L10nVisitor(this._value);
 
-  static const _list = ['l10n', 'AppLocalizations.of(context)'];
+  static const _list = [
+    'l10n',
+    'context.l10n',
+    'AppLocalizations.of(context)',
+  ];
 
   final Iterable<String> _value;
 

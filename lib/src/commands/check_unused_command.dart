@@ -55,7 +55,11 @@ class CheckUnusedCommand extends Command<int> {
     final keys = (json.decode(
       await _fileSystem
           .file(
-            p.join(root, '${doc['arb-dir']}/${doc['template-arb-file']}'),
+            p.join(
+              root,
+              p.joinAll(doc['arb-dir'].toString().split(RegExp(r'(/|\\)'))),
+              doc['template-arb-file'].toString(),
+            ),
           )
           .readAsString(),
     ) as Map<String, dynamic>)
