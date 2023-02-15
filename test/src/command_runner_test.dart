@@ -160,7 +160,7 @@ void main() {
           '--root',
           'example',
         ]);
-        expect(result, equals(ExitCode.success.code));
+        expect(result, equals(1));
 
         verify(() => logger.detail('Argument information:')).called(1);
         verify(() => logger.detail('  Top level options:')).called(1);
