@@ -18,8 +18,8 @@ pubspec.lock
 .packages
 build
 coverage
-example
-!example/README.md
 dart_test.yaml
 test
 analysis_options.yaml
+example/*
+!example/README.md
