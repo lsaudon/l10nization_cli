@@ -1,3 +1,7 @@
+## 0.1.0
+
+- 💥 Executable l10nization_cli to l10nization
+
 ## 0.0.4
 
 - 🐛 Unignored example
