@@ -1,3 +1,7 @@
+## 0.0.3
+
+- 🐛 Fix not update version
+
 ## 0.0.2
 
 - ✨ exit code 1 if find unused translations
