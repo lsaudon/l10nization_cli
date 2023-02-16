@@ -1,7 +1,6 @@
 name: l10nization_cli
 description: A Command-Line Interface to find unused l10n translations from an arb file.
-version: 0.0.1
-publish_to: none
+version: 0.0.2
 homepage: https://github.com/lsaudon/l10nization_cli
 repository: https://github.com/lsaudon/l10nization_cli
 issue_tracker: https://github.com/lsaudon/l10nization_cli/issues
@@ -10,12 +9,12 @@ environment:
   sdk: ">=2.19.2 <3.0.0"
 
 dependencies:
-  analyzer: ^5.4.0
+  analyzer: ^5.5.0
   args: ^2.4.0
   cli_completion: ^0.2.0
   file: ^6.1.4
   glob: ^2.1.1
-  mason_logger: ^0.2.4
+  mason_logger: ^0.2.5
   path: ^1.8.3
   pub_updater: ^0.2.4
   yaml: ^3.1.1

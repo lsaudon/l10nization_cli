@@ -1,16 +1,15 @@
-# example
+# Example
 
-A new Flutter project.
+```sh
+# Activate Very Good CLI
+dart pub global activate l10nization_cli
 
-## Getting Started
+# See list of available commands
+l10nization_cli --help
 
-This project is a starting point for a Flutter application.
+# Check unused translations
+l10nization_cli check-unused
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Check unused translations with root params
+l10nization_cli check-unused --root <folder-of-app>
+```
