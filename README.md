@@ -20,13 +20,13 @@ dart pub global activate l10nization_cli
 
 ```sh
 # Check unused translations
-l10nization_cli check-unused --root <folder-of-app>
+l10nization check-unused --root <folder-of-app>
 ```
 
 ## Running locally
 
 ```sh
-dart pub global activate --source=path . && l10nization_cli check-unused --root example
+dart pub global activate --source=path . && l10nization check-unused --root example
 ```
 
 ## Running Tests with coverage 🧪

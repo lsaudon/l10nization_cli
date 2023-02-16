@@ -10,7 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
 /// {@template check_unused_command}
-/// `l10nization_cli check-unused`
+/// `l10nization check-unused`
 ///
 /// A [Command] to exemplify a sub command
 /// {@endtemplate}

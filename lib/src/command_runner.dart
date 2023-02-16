@@ -9,7 +9,7 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
 
 /// executableName
-const executableName = 'l10nization_cli';
+const executableName = 'l10nization';
 
 /// packageName
 const packageName = 'l10nization_cli';
@@ -21,7 +21,7 @@ const description = 'A Very Good Project created by Very Good CLI.';
 /// A [CommandRunner] for the CLI.
 ///
 /// ```
-/// $ l10nization_cli --version
+/// $ l10nization --version
 /// ```
 /// {@endtemplate}
 class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {

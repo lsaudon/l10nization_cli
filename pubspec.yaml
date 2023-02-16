@@ -27,4 +27,4 @@ dev_dependencies:
   test: ^1.23.1
 
 executables:
-  l10nization_cli:
+  l10nization:
