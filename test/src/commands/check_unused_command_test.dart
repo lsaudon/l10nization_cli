@@ -150,5 +150,65 @@ void main() {
         expect(exitCode, 1);
       });
     });
+
+    group(
+        '''when 0 translation by extension of AppLocalizations is unused then success code''',
+        () {
+      const l10nFileContent = '''
+arb-dir: lib/l10n/arb
+template-arb-file: app_en.arb''';
+
+      const arbFileContentSimple = '''
+{
+  "@@locale": "en",
+  "a": "a"
+}''';
+
+      const l10nDartFileContent = '''
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+extension AppLocalizationsExtension on AppLocalizations {
+  String byKey(final String value) {
+    switch (value) {
+      case 'a':
+        return a;
+      default:
+        throw Exception();
+    }
+  }
+}
+''';
+
+      test('with --root', () async {
+        final mfs = MemoryFileSystem.test(
+          style: Platform.isWindows
+              ? FileSystemStyle.windows
+              : FileSystemStyle.posix,
+        );
+        <String, String>{
+          p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+          p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+          'l10n.yaml': l10nFileContent,
+        }.forEach(
+          (final path, final content) => mfs.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
+
+        final logger = MockLogger();
+        final exitCode = await L10nizationCliCommandRunner(
+          logger: logger,
+          fileSystem: mfs,
+        ).run(
+          [CheckUnusedCommand.commandName],
+        );
+
+        verifyNever(() => logger.info('a'));
+
+        expect(exitCode, ExitCode.success.code);
+      });
+    });
   });
 }
