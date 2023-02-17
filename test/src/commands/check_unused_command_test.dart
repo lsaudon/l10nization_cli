@@ -1,16 +1,33 @@
 import 'dart:io' show Platform;
 
+import 'package:file/file.dart';
 import 'package:file/memory.dart';
 import 'package:l10nization_cli/src/command_runner.dart';
-import 'package:l10nization_cli/src/commands/commands.dart';
+import 'package:l10nization_cli/src/commands/check_unused/check_unused_command.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import '../mocks/mocks.dart';
+class _MockLogger extends Mock implements Logger {}
 
 void main() {
+  late FileSystem fileSystem;
+  late Logger logger;
+  late L10nizationCliCommandRunner commandRunner;
+
+  setUp(() {
+    fileSystem = MemoryFileSystem.test(
+      style:
+          Platform.isWindows ? FileSystemStyle.windows : FileSystemStyle.posix,
+    );
+    logger = _MockLogger();
+    commandRunner = L10nizationCliCommandRunner(
+      logger: logger,
+      fileSystem: fileSystem,
+    );
+  });
+
   group('check-unused', () {
     group('when 0 translation is unused then success code', () {
       const l10nFileContent = '''
@@ -29,28 +46,18 @@ void main() {
 }''';
 
       test('with --root', () async {
-        final mfs = MemoryFileSystem.test(
-          style: Platform.isWindows
-              ? FileSystemStyle.windows
-              : FileSystemStyle.posix,
-        );
         <String, String>{
           p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
           p.join('lib', 'main.dart'): mainFileContent,
           'l10n.yaml': l10nFileContent,
         }.forEach(
-          (final path, final content) => mfs.file(path)
+          (final path, final content) => fileSystem.file(path)
             ..createSync(recursive: true)
             ..writeAsStringSync(content),
         );
 
-        final logger = MockLogger();
-        final exitCode = await L10nizationCliCommandRunner(
-          logger: logger,
-          fileSystem: mfs,
-        ).run(
-          [CheckUnusedCommand.commandName],
-        );
+        final exitCode =
+            await commandRunner.run([CheckUnusedCommand.commandName]);
 
         verifyNever(() => logger.info('a'));
 
@@ -82,28 +89,18 @@ void main() {
 }''';
 
       test('without --root', () async {
-        final mfs = MemoryFileSystem.test(
-          style: Platform.isWindows
-              ? FileSystemStyle.windows
-              : FileSystemStyle.posix,
-        );
         <String, String>{
           p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
           p.join('lib', 'main.dart'): mainFileContent,
           'l10n.yaml': l10nFileContent,
         }.forEach(
-          (final path, final content) => mfs.file(path)
+          (final path, final content) => fileSystem.file(path)
             ..createSync(recursive: true)
             ..writeAsStringSync(content),
         );
 
-        final logger = MockLogger();
-        final exitCode = await L10nizationCliCommandRunner(
-          logger: logger,
-          fileSystem: mfs,
-        ).run(
-          [CheckUnusedCommand.commandName],
-        );
+        final exitCode =
+            await commandRunner.run([CheckUnusedCommand.commandName]);
 
         verifyNever(() => logger.info('a'));
         verifyNever(() => logger.info('b'));
@@ -114,33 +111,22 @@ void main() {
       });
 
       test('with --root', () async {
-        final mfs = MemoryFileSystem.test(
-          style: Platform.isWindows
-              ? FileSystemStyle.windows
-              : FileSystemStyle.posix,
-        );
         <String, String>{
           p.join('my_app', 'lib', 'l10n', 'arb', 'app_en.arb'):
               arbFileContentSimple,
           p.join('my_app', 'lib', 'main.dart'): mainFileContent,
           p.join('my_app', 'l10n.yaml'): l10nFileContent,
         }.forEach(
-          (final path, final content) => mfs.file(path)
+          (final path, final content) => fileSystem.file(path)
             ..createSync(recursive: true)
             ..writeAsStringSync(content),
         );
 
-        final logger = MockLogger();
-        final exitCode = await L10nizationCliCommandRunner(
-          logger: logger,
-          fileSystem: mfs,
-        ).run(
-          [
-            CheckUnusedCommand.commandName,
-            '--root',
-            'my_app',
-          ],
-        );
+        final exitCode = await commandRunner.run([
+          CheckUnusedCommand.commandName,
+          '--root',
+          'my_app',
+        ]);
 
         verifyNever(() => logger.info('a'));
         verifyNever(() => logger.info('b'));
@@ -182,28 +168,18 @@ extension AppLocalizationsExtension on AppLocalizations {
 ''';
 
       test('with --root', () async {
-        final mfs = MemoryFileSystem.test(
-          style: Platform.isWindows
-              ? FileSystemStyle.windows
-              : FileSystemStyle.posix,
-        );
         <String, String>{
           p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
           p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
           'l10n.yaml': l10nFileContent,
         }.forEach(
-          (final path, final content) => mfs.file(path)
+          (final path, final content) => fileSystem.file(path)
             ..createSync(recursive: true)
             ..writeAsStringSync(content),
         );
 
-        final logger = MockLogger();
-        final exitCode = await L10nizationCliCommandRunner(
-          logger: logger,
-          fileSystem: mfs,
-        ).run(
-          [CheckUnusedCommand.commandName],
-        );
+        final exitCode =
+            await commandRunner.run([CheckUnusedCommand.commandName]);
 
         verifyNever(() => logger.info('a'));
 

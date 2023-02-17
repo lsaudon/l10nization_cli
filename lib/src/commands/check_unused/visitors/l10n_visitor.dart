@@ -17,9 +17,7 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
     if ((node.extendedType as NamedType).name.name != 'AppLocalizations') {
       return;
     }
-    final visitor = _Visitor(_values);
-    node.parent?.visitChildren(visitor);
-    visitor.usedKeys.forEach(_values.remove);
+    _removeUsedKeys(node);
   }
 
   @override
@@ -28,9 +26,7 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
     if (node.beginToken.lexeme != 'AppLocalizations') {
       return;
     }
-    final visitor = _Visitor(_values);
-    node.parent?.visitChildren(visitor);
-    visitor.usedKeys.forEach(_values.remove);
+    _removeUsedKeys(node);
   }
 
   @override
@@ -39,9 +35,7 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
     if (node.name != 'context.l10n') {
       return;
     }
-    final visitor = _Visitor(_values);
-    node.parent?.visitChildren(visitor);
-    visitor.usedKeys.forEach(_values.remove);
+    _removeUsedKeys(node);
   }
 
   @override
@@ -50,6 +44,10 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
     if (node.name != 'l10n') {
       return;
     }
+    _removeUsedKeys(node);
+  }
+
+  void _removeUsedKeys(final AstNode node) {
     final visitor = _Visitor(_values);
     node.parent?.visitChildren(visitor);
     visitor.usedKeys.forEach(_values.remove);

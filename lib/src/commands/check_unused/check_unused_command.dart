@@ -4,7 +4,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
 import 'package:file/file.dart';
 import 'package:glob/glob.dart';
-import 'package:l10nization_cli/src/visitors/l10n_visitor.dart';
+import 'package:l10nization_cli/src/commands/check_unused/visitors/l10n_visitor.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
