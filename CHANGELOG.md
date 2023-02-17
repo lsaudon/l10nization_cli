@@ -1,3 +1,7 @@
+## 0.1.1
+
+- 🐛 Used in an AppLocalizations extension
+
 ## 0.1.0
 
 - 💥 Executable l10nization_cli to l10nization
