@@ -1,14 +1,20 @@
 import 'dart:io';
 
 import 'package:l10nization_cli/src/command_runner.dart';
-import 'package:l10nization_cli/src/commands/commands.dart';
+import 'package:l10nization_cli/src/commands/update_command.dart';
 import 'package:l10nization_cli/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:pub_updater/pub_updater.dart';
 import 'package:test/test.dart';
 
-import '../mocks/mocks.dart';
+class _MockLogger extends Mock implements Logger {}
+
+class _MockProcessResult extends Mock implements ProcessResult {}
+
+class _MockProgress extends Mock implements Progress {}
+
+class _MockPubUpdater extends Mock implements PubUpdater {}
 
 void main() {
   const latestVersion = '0.0.0';
@@ -20,11 +26,11 @@ void main() {
     late L10nizationCliCommandRunner commandRunner;
 
     setUp(() {
-      final progress = MockProgress();
+      final progress = _MockProgress();
       final progressLogs = <String>[];
-      pubUpdater = MockPubUpdater();
-      logger = MockLogger();
-      processResult = MockProcessResult();
+      pubUpdater = _MockPubUpdater();
+      logger = _MockLogger();
+      processResult = _MockProcessResult();
       commandRunner = L10nizationCliCommandRunner(
         logger: logger,
         pubUpdater: pubUpdater,
@@ -144,7 +150,7 @@ void main() {
             versionConstraint: any(named: 'versionConstraint'),
           ),
         ).thenAnswer((final _) async => processResult);
-        when(() => logger.progress(any())).thenReturn(MockProgress());
+        when(() => logger.progress(any())).thenReturn(_MockProgress());
         final result = await commandRunner.run([UpdateCommand.commandName]);
         expect(result, equals(ExitCode.success.code));
         verify(() => logger.progress('Checking for updates')).called(1);
@@ -164,7 +170,7 @@ void main() {
         when(
           () => pubUpdater.getLatestVersion(any()),
         ).thenAnswer((final _) async => packageVersion);
-        when(() => logger.progress(any())).thenReturn(MockProgress());
+        when(() => logger.progress(any())).thenReturn(_MockProgress());
         final result = await commandRunner.run([UpdateCommand.commandName]);
         expect(result, equals(ExitCode.success.code));
         verify(

@@ -9,7 +9,13 @@ import 'package:mocktail/mocktail.dart';
 import 'package:pub_updater/pub_updater.dart';
 import 'package:test/test.dart';
 
-import 'mocks/mocks.dart';
+class _MockLogger extends Mock implements Logger {}
+
+class _MockProcessResult extends Mock implements ProcessResult {}
+
+class _MockProgress extends Mock implements Progress {}
+
+class _MockPubUpdater extends Mock implements PubUpdater {}
 
 const latestVersion = '0.0.0';
 
@@ -25,14 +31,14 @@ void main() {
     late L10nizationCliCommandRunner commandRunner;
 
     setUp(() {
-      pubUpdater = MockPubUpdater();
+      pubUpdater = _MockPubUpdater();
 
       when(() => pubUpdater.getLatestVersion(any()))
           .thenAnswer((final _) async => Future.value(packageVersion));
 
-      logger = MockLogger();
+      logger = _MockLogger();
 
-      processResult = MockProcessResult();
+      processResult = _MockProcessResult();
       when(() => processResult.exitCode).thenReturn(ExitCode.success.code);
 
       commandRunner = L10nizationCliCommandRunner(
@@ -82,7 +88,7 @@ void main() {
         ),
       ).thenAnswer((final _) async => true);
 
-      final progress = MockProgress();
+      final progress = _MockProgress();
       final progressLogs = <String>[];
       when(() => progress.complete(any())).thenAnswer((final _) {
         final message = _.positionalArguments.elementAt(0) as String?;
