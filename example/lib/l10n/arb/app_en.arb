@@ -1,5 +1,6 @@
 {
   "@@locale": "en",
+  "helloMars": "Hello Mars",
   "helloMoon": "Hello Moon",
   "helloWorld": "Hello World",
   "seeingTheWorldAgain": "Seeing the world again"

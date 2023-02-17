@@ -6,25 +6,70 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
   /// L10nVisitor
   L10nVisitor(final Iterable<String> keys) : _values = keys.toList();
 
-  static const _list = [
-    'l10n',
-    'context.l10n',
-    'AppLocalizations.of(context)',
-  ];
+  final List<String> _values;
+
+  /// unusedKeys
+  Iterable<String> get unusedKeys => _values;
+
+  @override
+  void visitExtensionDeclaration(final ExtensionDeclaration node) {
+    super.visitExtensionDeclaration(node);
+    if ((node.extendedType as NamedType).name.name != 'AppLocalizations') {
+      return;
+    }
+    final visitor = _Visitor(_values);
+    node.parent?.visitChildren(visitor);
+    visitor.usedKeys.forEach(_values.remove);
+  }
+
+  @override
+  void visitMethodInvocation(final MethodInvocation node) {
+    super.visitMethodInvocation(node);
+    if (node.beginToken.lexeme != 'AppLocalizations') {
+      return;
+    }
+    final visitor = _Visitor(_values);
+    node.parent?.visitChildren(visitor);
+    visitor.usedKeys.forEach(_values.remove);
+  }
+
+  @override
+  void visitPrefixedIdentifier(final PrefixedIdentifier node) {
+    super.visitPrefixedIdentifier(node);
+    if (node.name != 'context.l10n') {
+      return;
+    }
+    final visitor = _Visitor(_values);
+    node.parent?.visitChildren(visitor);
+    visitor.usedKeys.forEach(_values.remove);
+  }
+
+  @override
+  void visitSimpleIdentifier(final SimpleIdentifier node) {
+    super.visitSimpleIdentifier(node);
+    if (node.name != 'l10n') {
+      return;
+    }
+    final visitor = _Visitor(_values);
+    node.parent?.visitChildren(visitor);
+    visitor.usedKeys.forEach(_values.remove);
+  }
+}
+
+class _Visitor extends RecursiveAstVisitor<void> {
+  _Visitor(final Iterable<String> keys) : _values = keys.toList();
 
   final List<String> _values;
 
   /// unusedKeys
-  List<String> get unusedKeys => _values;
+  final List<String> usedKeys = <String>[];
 
   @override
   void visitSimpleIdentifier(final SimpleIdentifier node) {
-    if (_values.contains(node.name) &&
-        node.parent!.childEntities.any(
-          (final e) => _list.contains(e.toString()),
-        )) {
-      _values.remove(node.name);
+    super.visitSimpleIdentifier(node);
+    if (!_values.contains(node.name)) {
       return;
     }
+    usedKeys.add(node.name);
   }
 }
