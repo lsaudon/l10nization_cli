@@ -29,10 +29,9 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
   L10nizationCliCommandRunner({
     final Logger? logger,
     final PubUpdater? pubUpdater,
-    final FileSystem? fileSystem,
+    final FileSystem fileSystem = const LocalFileSystem(),
   })  : _logger = logger ?? Logger(),
         _pubUpdater = pubUpdater ?? PubUpdater(),
-        _fileSystem = fileSystem ?? const LocalFileSystem(),
         super(executableName, description) {
     // Add root options and flags
     argParser
@@ -48,7 +47,7 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
       );
 
     // Add sub commands
-    addCommand(CheckUnusedCommand(logger: _logger, fileSystem: _fileSystem));
+    addCommand(CheckUnusedCommand(logger: _logger, fileSystem: fileSystem));
     addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
@@ -57,7 +56,6 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
 
   final Logger _logger;
   final PubUpdater _pubUpdater;
-  final FileSystem _fileSystem;
 
   @override
   Future<int> run(final Iterable<String> args) async {

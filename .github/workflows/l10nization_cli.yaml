@@ -48,4 +48,4 @@ jobs:
           dart pub get
 
       - name: 🔎 Verify version
-        run: dart run test --run-skipped -t version-verify
+        run: dart test --run-skipped -t version-verify

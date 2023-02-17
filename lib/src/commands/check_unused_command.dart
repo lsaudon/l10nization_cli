@@ -29,6 +29,9 @@ class CheckUnusedCommand extends Command<int> {
     );
   }
 
+  final Logger _logger;
+  final FileSystem _fileSystem;
+
   @override
   String get description => 'Check unused localizations values';
 
@@ -37,9 +40,6 @@ class CheckUnusedCommand extends Command<int> {
 
   @override
   String get name => commandName;
-
-  final Logger _logger;
-  final FileSystem _fileSystem;
 
   @override
   Future<int> run() async {
