@@ -23,6 +23,31 @@ dart pub global activate l10nization_cli
 l10nization check-unused --root <folder-of-app>
 ```
 
+### Cases considered
+
+```dart
+return Text(context.l10n.hello);
+```
+```dart
+final l10n = AppLocalizations.of(context);
+return Text(l10n.a);
+```
+```dart
+return Text(AppLocalizations.of(context).a);
+```
+```dart
+extension AppLocalizationsExtension on AppLocalizations {
+  String byKey(final String value) {
+    switch (value) {
+      case 'helloMars':
+        return helloMars;
+      default:
+        throw Exception();
+    }
+  }
+}
+```
+
 ## Running locally
 
 ```sh

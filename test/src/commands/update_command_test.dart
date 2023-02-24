@@ -73,7 +73,7 @@ void main() {
         ).thenThrow(Exception('oops'));
         final result = await commandRunner.run([UpdateCommand.commandName]);
         expect(result, equals(ExitCode.software.code));
-        verify(() => logger.progress('Checking for updates')).called(1);
+        verify(() => logger.progress('Checking for updates'));
         verify(() => logger.err('Exception: oops'));
         verifyNever(
           () => pubUpdater.update(
@@ -98,14 +98,14 @@ void main() {
         ).thenThrow(Exception('oops'));
         final result = await commandRunner.run([UpdateCommand.commandName]);
         expect(result, equals(ExitCode.software.code));
-        verify(() => logger.progress('Checking for updates')).called(1);
+        verify(() => logger.progress('Checking for updates'));
         verify(() => logger.err('Exception: oops'));
         verify(
           () => pubUpdater.update(
             packageName: any(named: 'packageName'),
             versionConstraint: any(named: 'versionConstraint'),
           ),
-        ).called(1);
+        );
       },
     );
 
@@ -128,14 +128,14 @@ void main() {
       final result = await commandRunner.run([UpdateCommand.commandName]);
 
       expect(result, equals(ExitCode.software.code));
-      verify(() => logger.progress('Checking for updates')).called(1);
+      verify(() => logger.progress('Checking for updates'));
       verify(() => logger.err('Error updating CLI: $error'));
       verify(
         () => pubUpdater.update(
           packageName: any(named: 'packageName'),
           versionConstraint: any(named: 'versionConstraint'),
         ),
-      ).called(1);
+      );
     });
 
     test(
@@ -153,14 +153,14 @@ void main() {
         when(() => logger.progress(any())).thenReturn(_MockProgress());
         final result = await commandRunner.run([UpdateCommand.commandName]);
         expect(result, equals(ExitCode.success.code));
-        verify(() => logger.progress('Checking for updates')).called(1);
-        verify(() => logger.progress('Updating to $latestVersion')).called(1);
+        verify(() => logger.progress('Checking for updates'));
+        verify(() => logger.progress('Updating to $latestVersion'));
         verify(
           () => pubUpdater.update(
             packageName: packageName,
             versionConstraint: latestVersion,
           ),
-        ).called(1);
+        );
       },
     );
 
@@ -175,7 +175,7 @@ void main() {
         expect(result, equals(ExitCode.success.code));
         verify(
           () => logger.info('CLI is already at the latest version.'),
-        ).called(1);
+        );
         verifyNever(() => logger.progress('Updating to $latestVersion'));
         verifyNever(
           () => pubUpdater.update(
