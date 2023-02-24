@@ -1,3 +1,7 @@
+## 1.0.0
+
+- ✨ Improve translations detection
+
 ## 0.1.1
 
 - 🐛 Used in an AppLocalizations extension
