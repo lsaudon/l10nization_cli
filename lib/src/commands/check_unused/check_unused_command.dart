@@ -4,6 +4,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:args/command_runner.dart';
 import 'package:file/file.dart';
 import 'package:glob/glob.dart';
+import 'package:l10nization_cli/src/commands/check_unused/visitors/build_context_visitor.dart';
 import 'package:l10nization_cli/src/commands/check_unused/visitors/l10n_visitor.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart' as p;
@@ -45,8 +46,19 @@ class CheckUnusedCommand extends Command<int> {
   Future<int> run() async {
     final root = _getRoot();
     final list = await _getDartFiles(root);
+    const localizationClass = 'AppLocalizations';
+    final methodName = await _getMethodNameOfAppLocalizations(
+      list: list,
+      localizationClass: localizationClass,
+    );
+
     final keys = await _getKeys(root);
-    final unusedKeys = await _getUnusedTranslations(list, keys);
+    final unusedKeys = await _getUnusedTranslations(
+      list: list,
+      keys: keys,
+      localizationClass: localizationClass,
+      methodName: methodName,
+    );
 
     if (unusedKeys.isEmpty) {
       return ExitCode.success.code;
@@ -59,7 +71,7 @@ The list of unused translations:
     unusedKeys.forEach(_logger.info);
     _logger.info('');
 
-    return 1;
+    return ExitCode.usage.code;
   }
 
   String _getRoot() => p.join(
@@ -100,13 +112,35 @@ The list of unused translations:
         .where((final e) => !e.startsWith('@'));
   }
 
-  Future<Iterable<String>> _getUnusedTranslations(
-    final Iterable<FileSystemEntity> list,
-    final Iterable<String> keys,
-  ) async {
+  Future<String> _getMethodNameOfAppLocalizations({
+    required final Iterable<FileSystemEntity> list,
+    required final String localizationClass,
+  }) async {
+    for (final file in list) {
+      final visitor = BuildContextVisitor(localizationClass: localizationClass);
+      parseString(content: await _fileSystem.file(file).readAsString())
+          .unit
+          .visitChildren(visitor);
+      if (visitor.methodName.isNotEmpty) {
+        return visitor.methodName;
+      }
+    }
+    return '';
+  }
+
+  Future<Iterable<String>> _getUnusedTranslations({
+    required final Iterable<FileSystemEntity> list,
+    required final Iterable<String> keys,
+    required final String localizationClass,
+    required final String methodName,
+  }) async {
     final aKeys = keys.toList();
     for (final file in list) {
-      final visitor = L10nVisitor(aKeys);
+      final visitor = L10nVisitor(
+        localizationClass: localizationClass,
+        keys: aKeys,
+        methodName: methodName,
+      );
       parseString(content: await _fileSystem.file(file).readAsString())
           .unit
           .visitChildren(visitor);

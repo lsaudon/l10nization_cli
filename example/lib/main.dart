@@ -30,6 +30,7 @@ class _HomePage extends StatelessWidget {
             Text(AppLocalizations.of(context).helloWorld),
             Text(AppLocalizations.of(context).helloWorld),
             Text(l10n.helloMoon),
+            Text(context.l10n.seeingTheWorldAgain),
             Text(Stuff().seeingTheWorldAgain),
           ],
         ),

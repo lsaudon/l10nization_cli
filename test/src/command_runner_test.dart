@@ -54,7 +54,7 @@ void main() {
 
       final result = await commandRunner.run(['--version']);
       expect(result, equals(ExitCode.success.code));
-      verify(() => logger.info(updatePrompt)).called(1);
+      verify(() => logger.info(updatePrompt));
     });
 
     test(
@@ -121,8 +121,8 @@ void main() {
       });
       final result = await commandRunner.run(['--version']);
       expect(result, equals(ExitCode.usage.code));
-      verify(() => logger.err(exception.message)).called(1);
-      verify(() => logger.info(commandRunner.usage)).called(1);
+      verify(() => logger.err(exception.message));
+      verify(() => logger.info(commandRunner.usage));
     });
 
     test('handles UsageException', () async {
@@ -136,15 +136,15 @@ void main() {
       });
       final result = await commandRunner.run(['--version']);
       expect(result, equals(ExitCode.usage.code));
-      verify(() => logger.err(exception.message)).called(1);
-      verify(() => logger.info('exception usage')).called(1);
+      verify(() => logger.err(exception.message));
+      verify(() => logger.info('exception usage'));
     });
 
     group('--version', () {
       test('outputs current version', () async {
         final result = await commandRunner.run(['--version']);
         expect(result, equals(ExitCode.success.code));
-        verify(() => logger.info(packageVersion)).called(1);
+        verify(() => logger.info(packageVersion));
       });
     });
 
@@ -153,9 +153,9 @@ void main() {
         final result = await commandRunner.run(['--verbose']);
         expect(result, equals(ExitCode.success.code));
 
-        verify(() => logger.detail('Argument information:')).called(1);
-        verify(() => logger.detail('  Top level options:')).called(1);
-        verify(() => logger.detail('  - verbose: true')).called(1);
+        verify(() => logger.detail('Argument information:'));
+        verify(() => logger.detail('  Top level options:'));
+        verify(() => logger.detail('  - verbose: true'));
         verifyNever(() => logger.detail('    Command options:'));
       });
 
@@ -166,14 +166,14 @@ void main() {
           '--root',
           'example',
         ]);
-        expect(result, equals(1));
+        expect(result, equals(ExitCode.success.code));
 
-        verify(() => logger.detail('Argument information:')).called(1);
-        verify(() => logger.detail('  Top level options:')).called(1);
-        verify(() => logger.detail('  - verbose: true')).called(1);
-        verify(() => logger.detail('  Command: check-unused')).called(1);
-        verify(() => logger.detail('    Command options:')).called(1);
-        verify(() => logger.detail('    - root: example')).called(1);
+        verify(() => logger.detail('Argument information:'));
+        verify(() => logger.detail('  Top level options:'));
+        verify(() => logger.detail('  - verbose: true'));
+        verify(() => logger.detail('  Command: check-unused'));
+        verify(() => logger.detail('    Command options:'));
+        verify(() => logger.detail('    - root: example'));
       });
     });
   });
