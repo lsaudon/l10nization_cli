@@ -1,4 +1,4 @@
-## Future releases
+## 1.1.0
 
 - ✨ Add final l10n = context.l10n case
 - ✨ Add AppLocalizations is a field of class case
