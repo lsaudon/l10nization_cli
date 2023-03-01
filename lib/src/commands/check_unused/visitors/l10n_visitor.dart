@@ -52,7 +52,18 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
         methodName: _methodName,
       );
       parent.thisOrAncestorOfType<BlockFunctionBody>()?.visitChildren(visitor);
-      return visitor.isL10nValue;
+      if (visitor.isL10nValue) {
+        return visitor.isL10nValue;
+      }
+      final visitor2 = _Visitor(
+        localizationClass: _localizationClass,
+        prefix: parent.prefix.name,
+        methodName: _methodName,
+      );
+      parent.thisOrAncestorOfType<ClassDeclaration>()?.visitChildren(visitor2);
+      if (visitor2.isL10nValue) {
+        return visitor2.isL10nValue;
+      }
     }
     if (_isExtension(parent)) {
       return true;
@@ -89,16 +100,22 @@ class _Visitor extends RecursiveAstVisitor<void> {
     super.visitVariableDeclaration(node);
     if (node.name.lexeme == _prefix) {
       final initializer = node.initializer;
-      if (initializer == null) {
-        return;
-      }
-      if (initializer is PrefixedIdentifier) {
-        isL10nValue = initializer.name == 'context.$_methodName';
+      if (initializer != null) {
+        if (initializer is PrefixedIdentifier) {
+          isL10nValue = initializer.name == 'context.$_methodName';
+        } else {
+          isL10nValue = _hasLocalizationClass(
+            expression: initializer,
+            localizationClass: _localizationClass,
+          );
+        }
       } else {
-        isL10nValue = _hasLocalizationClass(
-          expression: initializer,
-          localizationClass: _localizationClass,
-        );
+        final parent = node.parent;
+        if (parent != null && parent is VariableDeclarationList) {
+          final type = parent.type;
+          isL10nValue =
+              type is NamedType && type.name.name == _localizationClass;
+        }
       }
     }
   }

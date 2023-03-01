@@ -44,6 +44,22 @@ return Text(AppLocalizations.of(context).a);
 ```
 
 ```dart
+class MyWidget extends StatelessWidget {
+  const MyWidget({
+    required this.l10n,
+    super.key,
+  });
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(l10n.helloMoon);
+  }
+}
+```
+
+```dart
 extension AppLocalizationsExtension on AppLocalizations {
   String byKey(final String value) {
     switch (value) {

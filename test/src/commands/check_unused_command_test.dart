@@ -455,6 +455,41 @@ Widget build(final BuildContext context) {
       expect(exitCode, ExitCode.success.code);
     });
 
+    test('case AppLocalizations is a field of class', () async {
+      const mainDartFileContent = '''
+class MyWidget extends StatelessWidget {
+  const MyWidget({
+    required this.l10n,
+    super.key,
+  });
+
+  final AppLocalizations l10n;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(l10n.a);
+  }
+}
+''';
+
+      <String, String>{
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'main.dart'): mainDartFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => fileSystem.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
+
+      final exitCode =
+          await commandRunner.run([CheckUnusedCommand.commandName]);
+
+      verifyNever(() => logger.info('a'));
+
+      expect(exitCode, ExitCode.success.code);
+    });
+
     test('case AppLocalizations.of(context).a', () async {
       const mainDartFileContent = '''
 Widget build(final BuildContext context) {
