@@ -101,7 +101,7 @@ open coverage/index.html
 ## Build version
 
 ```sh
-dart run build_runner build
+dart run build_runner build -d
 ```
 
 ---
