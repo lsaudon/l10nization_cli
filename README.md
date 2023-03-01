@@ -28,13 +28,21 @@ l10nization check-unused --root <folder-of-app>
 ```dart
 return Text(context.l10n.hello);
 ```
+
 ```dart
 final l10n = AppLocalizations.of(context);
 return Text(l10n.a);
 ```
+
+```dart
+final l10n = context.l10n;
+return Text(l10n.a);
+```
+
 ```dart
 return Text(AppLocalizations.of(context).a);
 ```
+
 ```dart
 extension AppLocalizationsExtension on AppLocalizations {
   String byKey(final String value) {

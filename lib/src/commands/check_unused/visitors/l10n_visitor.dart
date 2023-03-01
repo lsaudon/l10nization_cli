@@ -49,6 +49,7 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
       final visitor = _Visitor(
         localizationClass: _localizationClass,
         prefix: parent.prefix.name,
+        methodName: _methodName,
       );
       parent.thisOrAncestorOfType<BlockFunctionBody>()?.visitChildren(visitor);
       return visitor.isL10nValue;
@@ -72,11 +73,14 @@ class _Visitor extends RecursiveAstVisitor<void> {
   _Visitor({
     required final String localizationClass,
     required final String prefix,
+    required final String methodName,
   })  : _localizationClass = localizationClass,
-        _prefix = prefix;
+        _prefix = prefix,
+        _methodName = methodName;
 
   final String _prefix;
   final String _localizationClass;
+  final String _methodName;
 
   bool isL10nValue = false;
 
@@ -88,10 +92,14 @@ class _Visitor extends RecursiveAstVisitor<void> {
       if (initializer == null) {
         return;
       }
-      isL10nValue = _hasLocalizationClass(
-        expression: initializer,
-        localizationClass: _localizationClass,
-      );
+      if (initializer is PrefixedIdentifier) {
+        isL10nValue = initializer.name == 'context.$_methodName';
+      } else {
+        isL10nValue = _hasLocalizationClass(
+          expression: initializer,
+          localizationClass: _localizationClass,
+        );
+      }
     }
   }
 }
@@ -100,10 +108,10 @@ bool _hasLocalizationClass({
   required final Expression expression,
   required final String localizationClass,
 }) {
-  if (expression is! MethodInvocation) {
-    return false;
-  } else {
+  if (expression is MethodInvocation) {
     final target = expression.realTarget;
     return target is SimpleIdentifier && target.name == localizationClass;
+  } else {
+    return false;
   }
 }
