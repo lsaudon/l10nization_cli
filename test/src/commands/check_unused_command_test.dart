@@ -171,13 +171,13 @@ class Stuff {
       },
     );
 
-    test('case in extension of AppLocalizations', () async {
-      const arbFileContentSimple = '''
+    const arbFileContentSimple = '''
 {
   "@@locale": "en",
   "a": "a"
 }''';
 
+    test('case in extension of AppLocalizations', () async {
       const l10nDartFileContent = '''
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -213,12 +213,6 @@ extension AppLocalizationsExtension on AppLocalizations {
     });
 
     test('case context.l10n.a', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
-}''';
-
       const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
@@ -250,51 +244,7 @@ Widget build(final BuildContext context) {
       expect(exitCode, ExitCode.success.code);
     });
 
-    test('BuildContext extension without AppLocalizations method', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
-}''';
-
-      const l10nDartFileContent = '''
-extension AppLocalizationsX on BuildContext {
-  Stuff get l10n => Stuff.of(this);
-}''';
-
-      const mainDartFileContent = '''
-@override
-Widget build(final BuildContext context) {
-  return Text(context.l10n.a);
-}
-''';
-
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
-
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
-
-      verify(() => logger.info('a'));
-
-      expect(exitCode, ExitCode.usage.code);
-    });
-
     test('case context.i18n.a', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
-}''';
-
       const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get i18n => AppLocalizations.of(this);
@@ -326,12 +276,105 @@ Widget build(final BuildContext context) {
       expect(exitCode, ExitCode.success.code);
     });
 
-    test('case l10n.a', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
+    test('BuildContext extension without AppLocalizations method', () async {
+      const l10nDartFileContent = '''
+extension AppLocalizationsX on BuildContext {
+  Stuff get l10n => Stuff.of(this);
 }''';
+
+      const mainDartFileContent = '''
+@override
+Widget build(final BuildContext context) {
+  return Text(context.l10n.a);
+}
+''';
+
+      <String, String>{
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+        p.join('lib', 'main.dart'): mainDartFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => fileSystem.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
+
+      final exitCode =
+          await commandRunner.run([CheckUnusedCommand.commandName]);
+
+      verify(() => logger.info('a'));
+
+      expect(exitCode, ExitCode.usage.code);
+    });
+
+    test('case l10n = context.l10n', () async {
+      const l10nDartFileContent = '''
+extension AppLocalizationsX on BuildContext {
+  AppLocalizations get l10n => AppLocalizations.of(this);
+}''';
+
+      const mainDartFileContent = '''
+@override
+Widget build(final BuildContext context) {
+  final l10n = context.l10n;
+  return Text(l10n.a);
+}
+''';
+
+      <String, String>{
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+        p.join('lib', 'main.dart'): mainDartFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => fileSystem.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
+
+      final exitCode =
+          await commandRunner.run([CheckUnusedCommand.commandName]);
+
+      verifyNever(() => logger.info('a'));
+
+      expect(exitCode, ExitCode.success.code);
+    });
+
+    test('case i18n = context.i18n', () async {
+      const l10nDartFileContent = '''
+extension AppLocalizationsX on BuildContext {
+  AppLocalizations get i18n => AppLocalizations.of(this);
+}''';
+
+      const mainDartFileContent = '''
+@override
+Widget build(final BuildContext context) {
+  final i18n = context.i18n;
+  return Text(i18n.a);
+}
+''';
+
+      <String, String>{
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+        p.join('lib', 'main.dart'): mainDartFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => fileSystem.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
+
+      final exitCode =
+          await commandRunner.run([CheckUnusedCommand.commandName]);
+
+      verifyNever(() => logger.info('a'));
+
+      expect(exitCode, ExitCode.success.code);
+    });
+
+    test('case l10n.a', () async {
       const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final l10n = AppLocalizations.of(context);
@@ -358,11 +401,6 @@ Widget build(final BuildContext context) {
     });
 
     test('variable of AppLocalizations create in other build', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
-}''';
       const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final l10n = AppLocalizations.of(context);
@@ -392,11 +430,6 @@ Widget build(final BuildContext context) {
     });
 
     test('case i18n.a', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
-}''';
       const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final i18n = AppLocalizations.of(context);
@@ -423,11 +456,6 @@ Widget build(final BuildContext context) {
     });
 
     test('case AppLocalizations.of(context).a', () async {
-      const arbFileContentSimple = '''
-{
-  "@@locale": "en",
-  "a": "a"
-}''';
       const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   return Text(AppLocalizations.of(context).a);

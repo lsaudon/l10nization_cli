@@ -1,3 +1,7 @@
+## Future releases
+
+- ✨ Add final l10n = context.l10n case
+
 ## 1.0.0
 
 - ✨ Improve translations detection
