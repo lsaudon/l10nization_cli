@@ -1,9 +1,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-/// L10nVisitor
+/// BuildContextVisitor
 class BuildContextVisitor extends RecursiveAstVisitor<void> {
-  /// L10nVisitor
+  /// BuildContextVisitor
   BuildContextVisitor({required final String localizationClass})
       : _localizationClass = localizationClass;
 

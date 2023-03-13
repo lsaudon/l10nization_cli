@@ -72,6 +72,16 @@ extension AppLocalizationsExtension on AppLocalizations {
 }
 ```
 
+```dart
+String function(AppLocalizations l10n) {
+  return l10n.helloMoon;
+}
+```
+
+```dart
+String function(AppLocalizations l10n) => l10n.helloMoon;
+```
+
 ## Running locally
 
 ```sh
