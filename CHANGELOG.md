@@ -1,3 +1,8 @@
+## 2.0.0
+
+- 💥 --root is useless
+- ✨ Add case SimpleFormalParameter in MethodInvocation
+
 ## 1.1.0
 
 - ✨ Add final l10n = context.l10n case
