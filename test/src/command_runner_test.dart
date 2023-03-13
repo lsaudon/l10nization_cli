@@ -163,7 +163,6 @@ void main() {
         final result = await commandRunner.run([
           '--verbose',
           'check-unused',
-          '--root',
           'example',
         ]);
         expect(result, equals(ExitCode.success.code));
@@ -173,7 +172,6 @@ void main() {
         verify(() => logger.detail('  - verbose: true'));
         verify(() => logger.detail('  Command: check-unused'));
         verify(() => logger.detail('    Command options:'));
-        verify(() => logger.detail('    - root: example'));
       });
     });
   });

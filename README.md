@@ -20,7 +20,7 @@ dart pub global activate l10nization_cli
 
 ```sh
 # Check unused translations
-l10nization check-unused --root <folder-of-app>
+l10nization check-unused <folder-of-app>
 ```
 
 ### Cases considered
@@ -85,7 +85,7 @@ String function(AppLocalizations l10n) => l10n.helloMoon;
 ## Running locally
 
 ```sh
-dart pub global activate --source=path . && l10nization check-unused --root example
+dart pub global activate --source=path . && l10nization check-unused example
 ```
 
 ## Running Tests with coverage 🧪

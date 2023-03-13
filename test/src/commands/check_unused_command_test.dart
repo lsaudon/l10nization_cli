@@ -115,7 +115,7 @@ class Stuff {
 }
 ''';
 
-        test('without --root', () async {
+        test('current path', () async {
           <String, String>{
             p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
             p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
@@ -140,7 +140,7 @@ class Stuff {
           expect(exitCode, ExitCode.usage.code);
         });
 
-        test('with --root', () async {
+        test('with specific path', () async {
           <String, String>{
             p.join('example', 'lib', 'l10n', 'arb', 'app_en.arb'):
                 arbFileContentSimple,
@@ -155,7 +155,6 @@ class Stuff {
 
           final exitCode = await commandRunner.run([
             CheckUnusedCommand.commandName,
-            '--root',
             'example',
           ]);
 

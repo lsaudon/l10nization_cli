@@ -10,6 +10,6 @@ l10nization --help
 # Check unused translations
 l10nization check-unused
 
-# Check unused translations with root params
-l10nization check-unused --root <folder-of-app>
+# Check unused translations with specific path
+l10nization check-unused <folder-of-app>
 ```
