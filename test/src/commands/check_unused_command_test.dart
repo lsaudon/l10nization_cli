@@ -514,5 +514,53 @@ Widget build(final BuildContext context) {
 
       expect(exitCode, ExitCode.success.code);
     });
+
+    test('case l10n is a parameter of a function', () async {
+      const mainDartFileContent = '''
+Widget build(final AppLocalizations l10n) {
+  return Text(l10n.a);
+}
+''';
+
+      <String, String>{
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'main.dart'): mainDartFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => fileSystem.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
+
+      final exitCode =
+          await commandRunner.run([CheckUnusedCommand.commandName]);
+
+      verifyNever(() => logger.info('a'));
+
+      expect(exitCode, ExitCode.success.code);
+    });
+
+    test('case l10n is a parameter of a expression', () async {
+      const mainDartFileContent = '''
+Widget build(final AppLocalizations l10n) => Text(l10n.a);
+''';
+
+      <String, String>{
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'main.dart'): mainDartFileContent,
+        'l10n.yaml': l10nFileContent,
+      }.forEach(
+        (final path, final content) => fileSystem.file(path)
+          ..createSync(recursive: true)
+          ..writeAsStringSync(content),
+      );
+
+      final exitCode =
+          await commandRunner.run([CheckUnusedCommand.commandName]);
+
+      verifyNever(() => logger.info('a'));
+
+      expect(exitCode, ExitCode.success.code);
+    });
   });
 }

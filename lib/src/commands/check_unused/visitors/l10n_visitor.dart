@@ -51,18 +51,31 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
         prefix: parent.prefix.name,
         methodName: _methodName,
       );
-      parent.thisOrAncestorOfType<BlockFunctionBody>()?.visitChildren(visitor);
+
+      final blockFunctionBody =
+          parent.thisOrAncestorOfType<BlockFunctionBody>();
+      if (blockFunctionBody != null) {
+        blockFunctionBody.visitChildren(visitor);
+        if (visitor.isL10nValue) {
+          return visitor.isL10nValue;
+        }
+        blockFunctionBody.parent?.visitChildren(visitor);
+        if (visitor.isL10nValue) {
+          return visitor.isL10nValue;
+        }
+      }
+
+      parent
+          .thisOrAncestorOfType<ExpressionFunctionBody>()
+          ?.parent
+          ?.visitChildren(visitor);
       if (visitor.isL10nValue) {
         return visitor.isL10nValue;
       }
-      final visitor2 = _Visitor(
-        localizationClass: _localizationClass,
-        prefix: parent.prefix.name,
-        methodName: _methodName,
-      );
-      parent.thisOrAncestorOfType<ClassDeclaration>()?.visitChildren(visitor2);
-      if (visitor2.isL10nValue) {
-        return visitor2.isL10nValue;
+
+      parent.thisOrAncestorOfType<ClassDeclaration>()?.visitChildren(visitor);
+      if (visitor.isL10nValue) {
+        return visitor.isL10nValue;
       }
     }
     if (_isExtension(parent)) {
@@ -98,27 +111,39 @@ class _Visitor extends RecursiveAstVisitor<void> {
   @override
   void visitVariableDeclaration(final VariableDeclaration node) {
     super.visitVariableDeclaration(node);
-    if (node.name.lexeme == _prefix) {
-      final initializer = node.initializer;
-      if (initializer != null) {
-        if (initializer is PrefixedIdentifier) {
-          isL10nValue = initializer.name == 'context.$_methodName';
-        } else {
-          isL10nValue = _hasLocalizationClass(
-            expression: initializer,
-            localizationClass: _localizationClass,
-          );
-        }
+    if (node.name.lexeme != _prefix) {
+      return;
+    }
+    final initializer = node.initializer;
+    if (initializer != null) {
+      if (initializer is PrefixedIdentifier) {
+        isL10nValue = initializer.name == 'context.$_methodName';
       } else {
-        final parent = node.parent;
-        if (parent != null && parent is VariableDeclarationList) {
-          final type = parent.type;
-          isL10nValue =
-              type is NamedType && type.name.name == _localizationClass;
-        }
+        isL10nValue = _hasLocalizationClass(
+          expression: initializer,
+          localizationClass: _localizationClass,
+        );
+      }
+    } else {
+      final parent = node.parent;
+      if (parent != null && parent is VariableDeclarationList) {
+        isL10nValue = _namedType(parent.type);
       }
     }
   }
+
+  @override
+  void visitSimpleFormalParameter(final SimpleFormalParameter node) {
+    super.visitSimpleFormalParameter(node);
+    if (node.name?.lexeme != _prefix) {
+      return;
+    }
+
+    isL10nValue = _namedType(node.type);
+  }
+
+  bool _namedType(final TypeAnnotation? type) =>
+      type is NamedType && type.name.name == _localizationClass;
 }
 
 bool _hasLocalizationClass({
