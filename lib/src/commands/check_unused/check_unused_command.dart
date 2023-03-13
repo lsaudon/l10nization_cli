@@ -21,14 +21,7 @@ class CheckUnusedCommand extends Command<int> {
     required final Logger logger,
     required final FileSystem fileSystem,
   })  : _logger = logger,
-        _fileSystem = fileSystem {
-    argParser.addOption(
-      'root',
-      abbr: 'r',
-      help: 'The path to the root of your project',
-      valueHelp: 'my_app',
-    );
-  }
+        _fileSystem = fileSystem;
 
   final Logger _logger;
   final FileSystem _fileSystem;
@@ -76,7 +69,7 @@ The list of unused translations:
 
   String _getRoot() => p.join(
         _fileSystem.currentDirectory.path,
-        argResults!['root'] as String? ?? '',
+        argResults!.rest.isNotEmpty ? argResults?.rest.first : '',
       );
 
   Future<Iterable<FileSystemEntity>> _getDartFiles(final String root) async =>
