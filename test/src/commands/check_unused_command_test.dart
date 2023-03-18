@@ -36,7 +36,7 @@ template-arb-file: app_en.arb''';
     group(
       'complex dart file',
       () {
-        const arbFileContentSimple = '''
+        const arbFileContent = '''
 {
   "@@locale": "en",
   "a": "a",
@@ -117,7 +117,7 @@ class Stuff {
 
         test('current path', () async {
           <String, String>{
-            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
             p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
             p.join('lib', 'main.dart'): mainDartFileContent,
             'l10n.yaml': l10nFileContent,
@@ -143,7 +143,7 @@ class Stuff {
         test('with specific path', () async {
           <String, String>{
             p.join('example', 'lib', 'l10n', 'arb', 'app_en.arb'):
-                arbFileContentSimple,
+                arbFileContent,
             p.join('example', 'lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
             p.join('example', 'lib', 'main.dart'): mainDartFileContent,
             p.join('example', 'l10n.yaml'): l10nFileContent,
@@ -170,14 +170,17 @@ class Stuff {
       },
     );
 
-    const arbFileContentSimple = '''
+    group(
+      'simple arb file',
+      () {
+        const arbFileContent = '''
 {
   "@@locale": "en",
   "a": "a"
 }''';
 
-    test('case in extension of AppLocalizations', () async {
-      const l10nDartFileContent = '''
+        test('case in extension of AppLocalizations', () async {
+          const l10nDartFileContent = '''
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -193,127 +196,128 @@ extension AppLocalizationsExtension on AppLocalizations {
   }
 }
 ''';
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case context.l10n.a', () async {
-      const l10nDartFileContent = '''
+        test('case context.l10n.a', () async {
+          const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }''';
 
-      const mainDartFileContent = '''
+          const mainDartFileContent = '''
 @override
 Widget build(final BuildContext context) {
   return Text(context.l10n.a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case context.i18n.a', () async {
-      const l10nDartFileContent = '''
+        test('case context.i18n.a', () async {
+          const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get i18n => AppLocalizations.of(this);
 }''';
 
-      const mainDartFileContent = '''
+          const mainDartFileContent = '''
 @override
 Widget build(final BuildContext context) {
   return Text(context.i18n.a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('BuildContext extension without AppLocalizations method', () async {
-      const l10nDartFileContent = '''
+        test('BuildContext extension without AppLocalizations method',
+            () async {
+          const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   Stuff get l10n => Stuff.of(this);
 }''';
 
-      const mainDartFileContent = '''
+          const mainDartFileContent = '''
 @override
 Widget build(final BuildContext context) {
   return Text(context.l10n.a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verify(() => logger.info('a'));
+          verify(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.usage.code);
-    });
+          expect(exitCode, ExitCode.usage.code);
+        });
 
-    test('case l10n = context.l10n', () async {
-      const l10nDartFileContent = '''
+        test('case l10n = context.l10n', () async {
+          const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }''';
 
-      const mainDartFileContent = '''
+          const mainDartFileContent = '''
 @override
 Widget build(final BuildContext context) {
   final l10n = context.l10n;
@@ -321,32 +325,32 @@ Widget build(final BuildContext context) {
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case i18n = context.i18n', () async {
-      const l10nDartFileContent = '''
+        test('case i18n = context.i18n', () async {
+          const l10nDartFileContent = '''
 extension AppLocalizationsX on BuildContext {
   AppLocalizations get i18n => AppLocalizations.of(this);
 }''';
 
-      const mainDartFileContent = '''
+          const mainDartFileContent = '''
 @override
 Widget build(final BuildContext context) {
   final i18n = context.i18n;
@@ -354,53 +358,53 @@ Widget build(final BuildContext context) {
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case l10n.a', () async {
-      const mainDartFileContent = '''
+        test('case l10n.a', () async {
+          const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final l10n = AppLocalizations.of(context);
   return Text(l10n.a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('variable of AppLocalizations create in other build', () async {
-      const mainDartFileContent = '''
+        test('variable of AppLocalizations create in other build', () async {
+          const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final l10n = AppLocalizations.of(context);
 }
@@ -410,52 +414,52 @@ Widget build(final BuildContext context) {
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verify(() => logger.info('a'));
+          verify(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.usage.code);
-    });
+          expect(exitCode, ExitCode.usage.code);
+        });
 
-    test('case i18n.a', () async {
-      const mainDartFileContent = '''
+        test('case i18n.a', () async {
+          const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final i18n = AppLocalizations.of(context);
   return Text(i18n.a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case AppLocalizations is a field of class', () async {
-      const mainDartFileContent = '''
+        test('case AppLocalizations is a field of class', () async {
+          const mainDartFileContent = '''
 class MyWidget extends StatelessWidget {
   const MyWidget({
     required this.l10n,
@@ -471,81 +475,122 @@ class MyWidget extends StatelessWidget {
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case AppLocalizations.of(context).a', () async {
-      const mainDartFileContent = '''
+        test('case AppLocalizations.of(context).a', () async {
+          const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   return Text(AppLocalizations.of(context).a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case l10n is a parameter of a function', () async {
-      const mainDartFileContent = '''
+        test('case l10n is a parameter of a function', () async {
+          const mainDartFileContent = '''
 Widget build(final AppLocalizations l10n) {
   return Text(l10n.a);
 }
 ''';
 
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+          verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
-    });
+          expect(exitCode, ExitCode.success.code);
+        });
 
-    test('case l10n is a parameter of a expression', () async {
-      const mainDartFileContent = '''
+        test('case l10n is a parameter of a expression', () async {
+          const mainDartFileContent = '''
 Widget build(final AppLocalizations l10n) => Text(l10n.a);
 ''';
 
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
+
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
+
+          verifyNever(() => logger.info('a'));
+
+          expect(exitCode, ExitCode.success.code);
+        });
+      },
+    );
+
+    test("case l10n.a('World')", () async {
+      const arbFileContent = '''
+{
+  "@@locale": "en",
+  "a": "Hello {name}",
+  "@a": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
+}''';
+
+      const mainDartFileContent = '''
+Widget build(final BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  const name = 'World';
+  return Text(l10n.a(name));
+}
+''';
       <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContentSimple,
+        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
         p.join('lib', 'main.dart'): mainDartFileContent,
         'l10n.yaml': l10nFileContent,
       }.forEach(
