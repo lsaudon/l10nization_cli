@@ -45,10 +45,18 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
         localizationClass: _localizationClass,
       );
     }
-    if (parent is PrefixedIdentifier) {
+    if (parent is PrefixedIdentifier ||
+        parent is MethodInvocation && parent.realTarget != null) {
+      var name = '';
+      if (parent is PrefixedIdentifier) {
+        name = parent.prefix.name;
+      } else if (parent is MethodInvocation && parent.realTarget != null) {
+        name = (parent.realTarget! as SimpleIdentifier).name;
+      }
+
       final visitor = _Visitor(
         localizationClass: _localizationClass,
-        prefix: parent.prefix.name,
+        prefix: name,
         methodName: _methodName,
       );
 
