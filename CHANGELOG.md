@@ -1,3 +1,7 @@
+## 2.0.1
+
+- 🐛 Translations with args missing
+
 ## 2.0.0
 
 - 💥 --root is useless
