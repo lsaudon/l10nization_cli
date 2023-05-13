@@ -96,7 +96,7 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
       parent.thisOrAncestorMatching(
         (final a) =>
             a is ExtensionDeclaration &&
-            (a.extendedType as NamedType).name.name == _localizationClass,
+            (a.extendedType as NamedType).name2.lexeme == _localizationClass,
       ) !=
       null;
 }
@@ -151,7 +151,7 @@ class _Visitor extends RecursiveAstVisitor<void> {
   }
 
   bool _namedType(final TypeAnnotation? type) =>
-      type is NamedType && type.name.name == _localizationClass;
+      type is NamedType && type.name2.lexeme == _localizationClass;
 }
 
 bool _hasLocalizationClass({

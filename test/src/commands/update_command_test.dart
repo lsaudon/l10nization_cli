@@ -10,8 +10,6 @@ import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockProcessResult extends Mock implements ProcessResult {}
-
 class _MockProgress extends Mock implements Progress {}
 
 class _MockPubUpdater extends Mock implements PubUpdater {}
@@ -22,7 +20,6 @@ void main() {
   group('update', () {
     late PubUpdater pubUpdater;
     late Logger logger;
-    late ProcessResult processResult;
     late L10nizationCliCommandRunner commandRunner;
 
     setUp(() {
@@ -30,7 +27,6 @@ void main() {
       final progressLogs = <String>[];
       pubUpdater = _MockPubUpdater();
       logger = _MockLogger();
-      processResult = _MockProcessResult();
       commandRunner = L10nizationCliCommandRunner(
         logger: logger,
         pubUpdater: pubUpdater,
@@ -43,7 +39,7 @@ void main() {
           packageName: packageName,
           versionConstraint: latestVersion,
         ),
-      ).thenAnswer((final _) async => processResult);
+      ).thenAnswer((final _) async => ProcessResult(0, 0, 0, 0));
       when(
         () => pubUpdater.isUpToDate(
           packageName: any(named: 'packageName'),
@@ -57,7 +53,6 @@ void main() {
         }
       });
       when(() => logger.progress(any())).thenReturn(progress);
-      when(() => processResult.exitCode).thenReturn(ExitCode.success.code);
     });
 
     test('can be instantiated without a pub updater', () {
@@ -111,9 +106,6 @@ void main() {
 
     test('handles pub update process errors', () async {
       const error = 'Oh no! Installing this is not possible right now!';
-
-      when(() => processResult.exitCode).thenReturn(1);
-      when<dynamic>(() => processResult.stderr).thenReturn(error);
       when(
         () => pubUpdater.getLatestVersion(any()),
       ).thenAnswer((final _) async => latestVersion);
@@ -123,7 +115,7 @@ void main() {
           packageName: any(named: 'packageName'),
           versionConstraint: any(named: 'versionConstraint'),
         ),
-      ).thenAnswer((final _) async => processResult);
+      ).thenAnswer((final _) async => ProcessResult(0, 1, 0, error));
 
       final result = await commandRunner.run([UpdateCommand.commandName]);
 
@@ -149,7 +141,7 @@ void main() {
             packageName: any(named: 'packageName'),
             versionConstraint: any(named: 'versionConstraint'),
           ),
-        ).thenAnswer((final _) async => processResult);
+        ).thenAnswer((final _) async => ProcessResult(0, 0, 0, 0));
         when(() => logger.progress(any())).thenReturn(_MockProgress());
         final result = await commandRunner.run([UpdateCommand.commandName]);
         expect(result, equals(ExitCode.success.code));

@@ -15,13 +15,13 @@ class BuildContextVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitExtensionDeclaration(final ExtensionDeclaration node) {
     super.visitExtensionDeclaration(node);
-    if ((node.extendedType as NamedType).name.name == 'BuildContext') {
-      final methodDeclarationList = node.members
-          .whereType<MethodDeclaration>()
-          .where(
-            (final e) =>
-                (e.returnType as NamedType?)?.name.name == _localizationClass,
-          );
+    if ((node.extendedType as NamedType).name2.lexeme == 'BuildContext') {
+      final methodDeclarationList =
+          node.members.whereType<MethodDeclaration>().where(
+                (final e) =>
+                    (e.returnType as NamedType?)?.name2.lexeme ==
+                    _localizationClass,
+              );
       if (methodDeclarationList.isEmpty) {
         return;
       }
