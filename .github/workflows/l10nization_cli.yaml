@@ -22,9 +22,35 @@ on:
 
 jobs:
   build:
-    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/dart_package.yml@v1
-    with:
-      min_coverage: 90
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v3
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: 📦 Install Dependencies
+        run: flutter pub get
+
+      - name: ✨ Check Formatting
+        run: dart format --set-exit-if-changed .
+      
+      - name: 🕵️ Analyze
+        run: dart analyze --fatal-infos --fatal-warnings lib test bin
+
+      - name: 🧪 Run Tests
+        run: |
+          dart pub global activate coverage 1.2.0
+          dart test --coverage=coverage && dart pub global run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info
+
+      - name: 📊 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v2
+        with:
+          min_coverage: 90
 
   pana:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/pana.yml@v1
@@ -35,14 +61,15 @@ jobs:
       - name: 📚 Git Checkout
         uses: actions/checkout@v3
 
-      - name: 🎯 Setup Dart
-        uses: dart-lang/setup-dart@v1
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          sdk: "stable"
+          channel: stable
+          cache: true
 
       - name: 📦 Install Dependencies
         run: |
-          dart pub get
+          flutter pub get
 
       - name: 🔎 Verify version
         run: dart test --run-skipped -t version-verify
