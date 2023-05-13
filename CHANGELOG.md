@@ -1,3 +1,7 @@
+## 2.1.0
+
+- ⬆️ Upgrade Dart SDK & dependencies
+
 ## 2.0.1
 
 - 🐛 Translations with args missing
