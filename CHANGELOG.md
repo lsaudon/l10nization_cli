@@ -1,3 +1,8 @@
+## 2.2.0
+
+- ✨ Add context.l10n.a(b) case
+- ⬆️ Upgrade analyzer, glob, mason_logger, test
+
 ## 2.1.0
 
 - ⬆️ Upgrade Dart SDK & dependencies
