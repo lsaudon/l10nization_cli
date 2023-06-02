@@ -568,7 +568,7 @@ Widget build(final AppLocalizations l10n) => Text(l10n.a);
       },
     );
 
-    test("case l10n.a('World')", () async {
+    group('case with parameter', () {
       const arbFileContent = '''
 {
   "@@locale": "en",
@@ -582,29 +582,62 @@ Widget build(final AppLocalizations l10n) => Text(l10n.a);
   }
 }''';
 
-      const mainDartFileContent = '''
+      test("case l10n.a('World')", () async {
+        const mainDartFileContent = '''
 Widget build(final BuildContext context) {
   final l10n = AppLocalizations.of(context);
   const name = 'World';
   return Text(l10n.a(name));
 }
 ''';
-      <String, String>{
-        p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
-        p.join('lib', 'main.dart'): mainDartFileContent,
-        'l10n.yaml': l10nFileContent,
-      }.forEach(
-        (final path, final content) => fileSystem.file(path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(content),
-      );
+        <String, String>{
+          p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+          p.join('lib', 'main.dart'): mainDartFileContent,
+          'l10n.yaml': l10nFileContent,
+        }.forEach(
+          (final path, final content) => fileSystem.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
 
-      final exitCode =
-          await commandRunner.run([CheckUnusedCommand.commandName]);
+        final exitCode =
+            await commandRunner.run([CheckUnusedCommand.commandName]);
 
-      verifyNever(() => logger.info('a'));
+        verifyNever(() => logger.info('a'));
 
-      expect(exitCode, ExitCode.success.code);
+        expect(exitCode, ExitCode.success.code);
+      });
+
+      test("case context.l10n.a('World')", () async {
+        const l10nDartFileContent = '''
+extension AppLocalizationsX on BuildContext {
+  AppLocalizations get l10n => AppLocalizations.of(this);
+}''';
+
+        const mainDartFileContent = '''
+Widget build(final BuildContext context) {
+  const name = 'World';
+  return Text(context.l10n.a(name));
+}
+''';
+        <String, String>{
+          p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+          p.join('lib', 'l10n', 'l10n.dart'): l10nDartFileContent,
+          p.join('lib', 'main.dart'): mainDartFileContent,
+          'l10n.yaml': l10nFileContent,
+        }.forEach(
+          (final path, final content) => fileSystem.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
+
+        final exitCode =
+            await commandRunner.run([CheckUnusedCommand.commandName]);
+
+        verifyNever(() => logger.info('a'));
+
+        expect(exitCode, ExitCode.success.code);
+      });
     });
   });
 }
