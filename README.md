@@ -82,6 +82,15 @@ String function(AppLocalizations l10n) {
 String function(AppLocalizations l10n) => l10n.helloMoon;
 ```
 
+```dart
+final l10n = context.l10n;
+return Text(l10n.a(b));
+```
+
+```dart
+return Text(context.l10n.a(b));
+```
+
 ## Running locally
 
 ```sh
