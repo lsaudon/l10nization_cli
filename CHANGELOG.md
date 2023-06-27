@@ -1,3 +1,7 @@
+## 2.2.1
+
+- 🐛 When method has same name of key
+
 ## 2.2.0
 
 - ✨ Add context.l10n.a(b) case
