@@ -54,8 +54,8 @@ class L10nVisitor extends RecursiveAstVisitor<void> {
         final realTarget = parent.realTarget!;
         if (realTarget is PrefixedIdentifier) {
           return realTarget.name == 'context.$_methodName';
-        } else {
-          name = (realTarget as SimpleIdentifier).name;
+        } else if (realTarget is SimpleIdentifier) {
+          name = realTarget.name;
         }
       }
 

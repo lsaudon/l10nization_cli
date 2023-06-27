@@ -170,6 +170,81 @@ class Stuff {
       },
     );
 
+    test(
+      'method with same name of key',
+      () async {
+        const arbFileContent = '''
+{
+  "@@locale": "en",
+  "c": "c"
+}''';
+
+        const mainDartFileContent = '''
+import 'package:example/l10n/l10n.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(final BuildContext context) => const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: _HomePage(),
+      );
+}
+
+class _HomePage extends StatelessWidget {
+  const _HomePage();
+
+  @override
+  Widget build(final BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(Stuff().c())
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Stuff {
+  String c(){
+    return '';
+  }
+}
+''';
+
+        <String, String>{
+          p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+          p.join('lib', 'main.dart'): mainDartFileContent,
+          'l10n.yaml': l10nFileContent,
+        }.forEach(
+          (final path, final content) => fileSystem.file(path)
+            ..createSync(recursive: true)
+            ..writeAsStringSync(content),
+        );
+
+        final exitCode =
+            await commandRunner.run([CheckUnusedCommand.commandName]);
+
+        verifyNever(() => logger.info('a'));
+        verifyNever(() => logger.info('b'));
+        verify(() => logger.info('c'));
+
+        expect(exitCode, ExitCode.usage.code);
+      },
+    );
+
     group(
       'simple arb file',
       () {
