@@ -1,100 +1,22 @@
-import 'dart:io';
-
 import 'package:args/command_runner.dart';
 import 'package:cli_completion/cli_completion.dart';
 import 'package:l10nization_cli/src/command_runner.dart';
 import 'package:l10nization_cli/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:pub_updater/pub_updater.dart';
 import 'package:test/test.dart';
 
 class _MockLogger extends Mock implements Logger {}
 
-class _MockProgress extends Mock implements Progress {}
-
-class _MockPubUpdater extends Mock implements PubUpdater {}
-
-const latestVersion = '0.0.0';
-
-final updatePrompt = '''
-${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u2192 ${lightCyan.wrap(latestVersion)}
-Run ${lightCyan.wrap('$executableName update')} to update''';
-
 void main() {
   group('L10nizationCliCommandRunner', () {
-    late PubUpdater pubUpdater;
     late Logger logger;
     late L10nizationCliCommandRunner commandRunner;
 
     setUp(() {
-      pubUpdater = _MockPubUpdater();
-
-      when(() => pubUpdater.getLatestVersion(any()))
-          .thenAnswer((final _) async => Future.value(packageVersion));
-
       logger = _MockLogger();
 
-      commandRunner = L10nizationCliCommandRunner(
-        logger: logger,
-        pubUpdater: pubUpdater,
-      );
-    });
-
-    test('shows update message when newer version exists', () async {
-      when(
-        () => pubUpdater.getLatestVersion(any()),
-      ).thenAnswer((final _) async => latestVersion);
-
-      final result = await commandRunner.run(['--version']);
-      expect(result, equals(ExitCode.success.code));
-      verify(() => logger.info(updatePrompt));
-    });
-
-    test(
-      'Does not show update message when the shell calls the '
-      'completion command',
-      () async {
-        when(
-          () => pubUpdater.getLatestVersion(any()),
-        ).thenAnswer((final _) async => latestVersion);
-
-        final result = await commandRunner.run(['completion']);
-        expect(result, equals(ExitCode.success.code));
-        verifyNever(() => logger.info(updatePrompt));
-      },
-    );
-
-    test('does not show update message when using update command', () async {
-      when(
-        () => pubUpdater.getLatestVersion(any()),
-      ).thenAnswer((final _) async => latestVersion);
-      when(
-        () => pubUpdater.update(
-          packageName: packageName,
-          versionConstraint: any(named: 'versionConstraint'),
-        ),
-      ).thenAnswer((final _) async => ProcessResult(0, 0, 0, 0));
-      when(
-        () => pubUpdater.isUpToDate(
-          packageName: any(named: 'packageName'),
-          currentVersion: any(named: 'currentVersion'),
-        ),
-      ).thenAnswer((final _) async => true);
-
-      final progress = _MockProgress();
-      final progressLogs = <String>[];
-      when(() => progress.complete(any())).thenAnswer((final _) {
-        final message = _.positionalArguments.elementAt(0) as String?;
-        if (message != null) {
-          progressLogs.add(message);
-        }
-      });
-      when(() => logger.progress(any())).thenReturn(progress);
-
-      final result = await commandRunner.run(['update']);
-      expect(result, equals(ExitCode.success.code));
-      verifyNever(() => logger.info(updatePrompt));
+      commandRunner = L10nizationCliCommandRunner(logger: logger);
     });
 
     test('can be instantiated without an explicit analytics/logger instance',

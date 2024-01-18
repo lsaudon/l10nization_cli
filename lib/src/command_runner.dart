@@ -4,10 +4,8 @@ import 'package:cli_completion/cli_completion.dart';
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:l10nization_cli/src/commands/check_unused/check_unused_command.dart';
-import 'package:l10nization_cli/src/commands/update_command.dart';
 import 'package:l10nization_cli/src/version.dart';
 import 'package:mason_logger/mason_logger.dart';
-import 'package:pub_updater/pub_updater.dart';
 
 /// executableName
 const executableName = 'l10nization';
@@ -29,10 +27,8 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
   /// {@macro l10nization_cli_command_runner}
   L10nizationCliCommandRunner({
     final Logger? logger,
-    final PubUpdater? pubUpdater,
     final FileSystem fileSystem = const LocalFileSystem(),
   })  : _logger = logger ?? Logger(),
-        _pubUpdater = pubUpdater ?? PubUpdater(),
         super(executableName, description) {
     // Add root options and flags
     argParser
@@ -49,14 +45,12 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
 
     // Add sub commands
     addCommand(CheckUnusedCommand(logger: _logger, fileSystem: fileSystem));
-    addCommand(UpdateCommand(logger: _logger, pubUpdater: _pubUpdater));
   }
 
   @override
   void printUsage() => _logger.info(usage);
 
   final Logger _logger;
-  final PubUpdater _pubUpdater;
 
   @override
   Future<int> run(final Iterable<String> args) async {
@@ -124,30 +118,6 @@ class L10nizationCliCommandRunner extends CompletionCommandRunner<int> {
       exitCode = await super.runCommand(topLevelResults);
     }
 
-    // Check for updates
-    if (topLevelResults.command?.name != UpdateCommand.commandName) {
-      await _checkForUpdates();
-    }
-
     return exitCode;
-  }
-
-  /// Checks if the current version (set by the build runner on the
-  /// version.dart file) is the most recent one. If not, show a prompt to the
-  /// user.
-  Future<void> _checkForUpdates() async {
-    try {
-      final latestVersion = await _pubUpdater.getLatestVersion(packageName);
-      final isUpToDate = packageVersion == latestVersion;
-      if (!isUpToDate) {
-        _logger
-          ..info('')
-          ..info(
-            '''
-${lightYellow.wrap('Update available!')} ${lightCyan.wrap(packageVersion)} \u2192 ${lightCyan.wrap(latestVersion)}
-Run ${lightCyan.wrap('$executableName update')} to update''',
-          );
-      }
-    } on Exception catch (_) {}
   }
 }
