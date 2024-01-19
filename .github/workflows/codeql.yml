@@ -24,6 +24,6 @@ jobs:
           input: dart_analyze.txt
           output: dart_analyze.sarif
       - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: dart_analyze.sarif
