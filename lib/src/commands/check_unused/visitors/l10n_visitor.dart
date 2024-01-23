@@ -155,6 +155,15 @@ class _Visitor extends RecursiveAstVisitor<void> {
     isL10nValue = _namedType(node.type);
   }
 
+  @override
+  void visitSuperFormalParameter(final SuperFormalParameter node) {
+    super.visitSuperFormalParameter(node);
+    if (node.name.lexeme != _prefix) {
+      return;
+    }
+    isL10nValue = true;
+  }
+
   bool _namedType(final TypeAnnotation? type) =>
       type is NamedType && type.name2.lexeme == _localizationClass;
 }

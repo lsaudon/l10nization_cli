@@ -568,6 +568,40 @@ class MyWidget extends StatelessWidget {
           expect(exitCode, ExitCode.success.code);
         });
 
+        test('case super.l10n', () async {
+          const mainDartFileContent = '''
+abstract class Base extends StatelessWidget {
+  const Base({required this.l10n, super.key});
+
+  final AppLocalizations l10n;
+}
+
+class NotBase extends Base {
+  const NotBase({required super.l10n, super.key});
+
+  @override
+  Widget build(final BuildContext context) => Text(l10n.a);
+}
+''';
+
+          <String, String>{
+            p.join('lib', 'l10n', 'arb', 'app_en.arb'): arbFileContent,
+            p.join('lib', 'main.dart'): mainDartFileContent,
+            'l10n.yaml': l10nFileContent,
+          }.forEach(
+            (final path, final content) => fileSystem.file(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(content),
+          );
+
+          final exitCode =
+              await commandRunner.run([CheckUnusedCommand.commandName]);
+
+          verifyNever(() => logger.info('a'));
+
+          expect(exitCode, ExitCode.success.code);
+        });
+
         test('case AppLocalizations.of(context).a', () async {
           const mainDartFileContent = '''
 Widget build(final BuildContext context) {

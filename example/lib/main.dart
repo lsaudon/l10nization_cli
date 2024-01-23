@@ -32,11 +32,25 @@ class _HomePage extends StatelessWidget {
             Text(l10n.helloMoon),
             Text(context.l10n.seeingTheWorldAgain),
             Text(Stuff().seeingTheWorldAgain),
+            NotBase(l10n: l10n),
           ],
         ),
       ),
     );
   }
+}
+
+abstract class Base extends StatelessWidget {
+  const Base({required this.l10n, super.key});
+
+  final AppLocalizations l10n;
+}
+
+class NotBase extends Base {
+  const NotBase({required super.l10n, super.key});
+
+  @override
+  Widget build(final BuildContext context) => Text(l10n.helloVenus);
 }
 
 class Stuff {
