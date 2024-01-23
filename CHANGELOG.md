@@ -1,3 +1,9 @@
+## 2.3.0
+
+- ✨ Add superclass parameter case
+- 🚨 Add lint rules
+- ⬆️ Upgrade analyzer, cli_completion, file, mason_logger, path, mocktail, test
+
 ## 2.2.1
 
 - 🐛 When method has same name of key

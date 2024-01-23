@@ -60,6 +60,29 @@ class MyWidget extends StatelessWidget {
 ```
 
 ```dart
+abstract class MySuperWidget extends StatelessWidget {
+  const MySuperWidget({
+    required this.l10n,
+    super.key,
+  });
+
+  final AppLocalizations l10n;
+}
+
+class MyWidget extends MySuperWidget {
+  const MyWidget({
+    required super.l10n,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(l10n.helloMoon);
+  }
+}
+```
+
+```dart
 extension AppLocalizationsExtension on AppLocalizations {
   String byKey(final String value) {
     switch (value) {
